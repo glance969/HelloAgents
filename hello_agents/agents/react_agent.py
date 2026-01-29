@@ -93,28 +93,17 @@ class ReActAgent(Agent):
         Args:
             tool: 工具实例(可以是普通Tool或MCPTool)
         """
-        # 检查是否是MCP工具
-        if hasattr(tool, 'auto_expand') and tool.auto_expand:
-            # MCP工具会自动展开为多个工具
-            if hasattr(tool, '_available_tools') and tool._available_tools:
-                for mcp_tool in tool._available_tools:
-                    # 创建包装工具
-                    from ..tools.base import Tool
-                    wrapped_tool = Tool(
-                        name=f"{tool.name}_{mcp_tool['name']}",
-                        description=mcp_tool.get('description', ''),
-                        func=lambda input_text, t=tool, tn=mcp_tool['name']: t.run({
-                            "action": "call_tool",
-                            "tool_name": tn,
-                            "arguments": {"input": input_text}
-                        })
-                    )
-                    self.tool_registry.register_tool(wrapped_tool)
-                print(f"✅ MCP工具 '{tool.name}' 已展开为 {len(tool._available_tools)} 个独立工具")
-            else:
-                self.tool_registry.register_tool(tool)
-        else:
-            self.tool_registry.register_tool(tool)
+        # 检查是否是可展开的工具（如MCPTool）
+        if hasattr(tool, 'expandable') and tool.expandable:
+            # 使用工具自身的 get_expanded_tools() 方法获取包装后的子工具
+            expanded_tools = tool.get_expanded_tools()
+            if expanded_tools:
+                for wrapped_tool in expanded_tools:
+                    self.tool_registry.register_tool(wrapped_tool, auto_expand=False)
+                print(f"✅ MCP工具 '{tool.name}' 已展开为 {len(expanded_tools)} 个独立工具")
+                return
+        # 普通工具或不可展开的工具
+        self.tool_registry.register_tool(tool)
 
     def run(self, input_text: str, **kwargs) -> str:
         """

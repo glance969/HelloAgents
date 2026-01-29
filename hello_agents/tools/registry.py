@@ -122,9 +122,21 @@ class ToolRegistry:
         """
         descriptions = []
 
-        # Tool对象描述
+        # Tool对象描述（包含参数信息）
         for tool in self._tools.values():
-            descriptions.append(f"- {tool.name}: {tool.description}")
+            tool_desc = f"- {tool.name}: {tool.description}"
+            # 添加参数信息
+            try:
+                params = tool.get_parameters()
+                if params:
+                    param_strs = []
+                    for p in params:
+                        req_mark = "*" if p.required else ""
+                        param_strs.append(f"{p.name}{req_mark}({p.type})")
+                    tool_desc += f"\n  参数: {', '.join(param_strs)}"
+            except Exception:
+                pass
+            descriptions.append(tool_desc)
 
         # 函数工具描述
         for name, info in self._functions.items():

@@ -102,11 +102,38 @@ class MCPWrappedTool(Tool):
         执行MCP工具
 
         Args:
-            params: 工具参数（直接传递给MCP工具）
+            params: 工具参数，支持两种格式：
+                1. 直接参数字典: {"symbol": "300058", "period": "daily"}
+                2. ToolRegistry包装格式: {"input": '{"symbol": "300058"}'}
 
         Returns:
             执行结果
         """
+        import json
+
+        # 兼容 ToolRegistry.execute_tool() 传入的 {"input": "..."} 格式
+        if "input" in params and len(params) == 1:
+            input_value = params["input"]
+
+            # 空输入且工具无参数 -> 传空字典
+            if not input_value and not self._parameters:
+                params = {}
+            elif isinstance(input_value, str):
+                try:
+                    parsed = json.loads(input_value)
+                    if isinstance(parsed, dict):
+                        params = parsed
+                except (json.JSONDecodeError, TypeError):
+                    # 非JSON字符串
+                    if not input_value:
+                        # 空字符串，清空params
+                        params = {}
+                    elif self._parameters:
+                        # 映射到第一个必需参数（或第一个参数）
+                        required_params = [p for p in self._parameters if p.required]
+                        target_param = required_params[0] if required_params else self._parameters[0]
+                        params = {target_param.name: input_value}
+
         # 构建MCP调用参数
         mcp_params = {
             "action": "call_tool",
