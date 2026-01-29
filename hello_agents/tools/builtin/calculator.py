@@ -36,6 +36,11 @@ class CalculatorTool(Tool):
         'exp': math.exp,
         'pi': math.pi,
         'e': math.e,
+        'floor': math.floor,
+        'ceil': math.ceil,
+        'pow': pow,
+        'int': int,
+        'float': float,
     }
     
     def __init__(self):
@@ -58,6 +63,9 @@ class CalculatorTool(Tool):
         expression = parameters.get("input", "") or parameters.get("expression", "")
         if not expression:
             return "错误：计算表达式不能为空"
+
+        # 去除前后空格，避免 "unexpected indent" 错误
+        expression = expression.strip()
 
         print(f"🧮 正在计算: {expression}")
 
@@ -125,4 +133,4 @@ def calculate(expression: str) -> str:
         计算结果字符串
     """
     tool = CalculatorTool()
-    return tool.run({"input": expression})
+    return tool.run({"input": expression.strip()})

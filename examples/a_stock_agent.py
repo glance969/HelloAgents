@@ -80,8 +80,12 @@ def demo_react_agent():
 
 Thought: 分析问题，确定需要什么信息，制定研究策略。
 Action: 选择合适的工具获取信息，格式为：
-- `{{tool_name}}[{{tool_input}}]`：调用工具获取信息。
-- `Finish[研究结论]`：当你有足够信息得出结论时。
+- 无参数工具：`tool_name[]`
+- 单参数工具：`tool_name[参数值]`
+- 多参数工具：`tool_name[{{"param1": "value1", "param2": "value2"}}]`（必须使用JSON格式）
+- 完成任务：`Finish[研究结论]`
+
+**重要**：多参数工具必须使用JSON格式，例如：`stock_prices[{{"symbol": "300058", "period": "daily"}}]`
 
 研究问题：{question}
 已完成的研究：{history}

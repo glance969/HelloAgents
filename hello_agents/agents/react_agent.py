@@ -19,12 +19,14 @@ DEFAULT_REACT_PROMPT = """你是一个具备推理和行动能力的AI助手。�
 
 Thought: 分析问题，确定需要什么信息，制定研究策略。
 Action: 选择合适的工具获取信息，格式为：
-- `{{tool_name}}[{{tool_input}}]`：调用工具获取信息。
-- `Finish[研究结论]`：当你有足够信息得出结论时。
+- 无参数工具：`tool_name[]`
+- 单参数工具：`tool_name[参数值]`
+- 多参数工具：`tool_name[{{"param1": "value1", "param2": "value2"}}]`（必须使用JSON格式）
+- 完成任务：`Finish[研究结论]`
 
 ## 重要提醒
 1. 每次回应必须包含Thought和Action两部分
-2. 工具调用的格式必须严格遵循：工具名[参数]
+2. **多参数工具必须使用JSON格式**，例如：`stock_info[{{"symbol": "300058", "market": "A"}}]`
 3. 只有当你确信有足够信息回答问题时，才使用Finish
 4. 如果工具返回的信息不够，继续使用其他工具或相同工具的不同参数
 

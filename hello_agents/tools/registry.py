@@ -131,9 +131,9 @@ class ToolRegistry:
                 if params:
                     param_strs = []
                     for p in params:
-                        req_mark = "*" if p.required else ""
-                        param_strs.append(f"{p.name}{req_mark}({p.type})")
-                    tool_desc += f"\n  参数: {', '.join(param_strs)}"
+                        req_mark = "(必填)" if p.required else "(可选)"
+                        param_strs.append(f'"{p.name}"{req_mark}')
+                    tool_desc += f"\n  参数(JSON格式): {{{', '.join(param_strs)}}}"
             except Exception:
                 pass
             descriptions.append(tool_desc)
